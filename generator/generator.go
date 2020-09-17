@@ -1,4 +1,4 @@
-package genertor
+package generator
 
 import (
 	"fmt"
@@ -36,7 +36,7 @@ func GenerateFile(path string, amount int) error {
 		arr = append(arr, b)
 	}
 
-	_, err  = f.Write(arr)
+	_, err = f.Write(arr)
 
 	buf, err := Read(path)
 
@@ -69,7 +69,7 @@ func Read(path string) ([]byte, error) {
 }
 
 func Parse(buf []byte) []int {
-	res := make([]int, 0, len(buf) / 2)
+	res := make([]int, 0, len(buf)/2)
 
 	for i := 0; i < len(buf); i++ {
 		n := 0
@@ -83,10 +83,9 @@ func Parse(buf []byte) []int {
 	return res
 }
 
-func closeFile(f *os.File)  {
+func closeFile(f *os.File) {
 	err := f.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
 }
-
