@@ -23,11 +23,11 @@ func (e External) Sort(path string, maxMemoryUse int64) {
 	e.sort(path, maxMemoryUse)
 }
 
-func (e External) sort(path string, maxMemory int64) string {
+func (e External) sort(path string, maxMemory int64) {
 	fileSize := utils.FileStatFromPath(path).Size()
 
 	if fileSize <= 2 {
-		return path
+		return
 	}
 
 	pathA := e.makeFilePath()
@@ -35,41 +35,66 @@ func (e External) sort(path string, maxMemory int64) string {
 
 	utils.SplitFile(path, pathA, pathB, maxMemory)
 
-	fmt.Println("a", utils.BytesToInt16(utils.Read(pathA)))
-	fmt.Println("b", utils.BytesToInt16(utils.Read(pathB)))
-
-	pathA = e.sort(pathA, maxMemory)
-	pathB = e.sort(pathB, maxMemory)
-
-	mergePath := e.makeFilePath()
+	e.sort(pathA, maxMemory)
+	e.sort(pathB, maxMemory)
 
 	fileA := utils.OpenFile(pathA)
 	fileB := utils.OpenFile(pathB)
-	mergeFile := utils.CreateFile(mergePath)
-	defer utils.CloseFile(mergeFile)
+	targetFile := utils.OpenFile(path)
 
 	sizeA := utils.FileStat(fileA).Size()
 	sizeB := utils.FileStat(fileB).Size()
-	maxMemoryForRead := maxMemory / 2
+
 	readA := int64(0)
 	readB := int64(0)
 
-	for readA < sizeA && readB < sizeB {
-		read, a := utils.ReadAndParse(fileA, e.calcMaxBuf(readA, sizeA, maxMemoryForRead))
-		readA += read
+	if sizeA > 0 && sizeB > 0 {
+		_, a := utils.ReadAndParse(fileA, int64(2))
+		_, b := utils.ReadAndParse(fileB, int64(2))
 
-		read, b := utils.ReadAndParse(fileB, e.calcMaxBuf(readB, sizeB, maxMemoryForRead))
-		readB += read
+		for {
+			if a[0] < b[0] {
+				utils.Write(targetFile, utils.Int16ToBytes(a))
+				readA += 2
+				if readA == sizeA {
+					utils.Write(targetFile, utils.Int16ToBytes(b))
+					readB += 2
+					break
+				}
+				_, a = utils.ReadAndParse(fileA, int64(2))
 
-		utils.Write(mergeFile, utils.Int16ToBytes(e.merge(a, b)))
+			} else {
+				utils.Write(targetFile, utils.Int16ToBytes(b))
+				readB += 2
+				if readB == sizeB {
+					utils.Write(targetFile, utils.Int16ToBytes(a))
+					readA += 2
+					break
+				}
+				_, b = utils.ReadAndParse(fileB, int64(2))
+
+			}
+		}
 	}
+
+	if readB < sizeB {
+		maxBuf := e.calcMaxBuf(readB, sizeB, maxMemory)
+		read, b := utils.ReadAndParse(fileB, maxBuf)
+		readB += read
+		utils.Write(targetFile, utils.Int16ToBytes(b))
+	}
+
+	if readA < sizeA {
+		maxBuf := e.calcMaxBuf(readA, sizeA, maxMemory)
+		read, a := utils.ReadAndParse(fileA, maxBuf)
+		readA += read
+		utils.Write(targetFile, utils.Int16ToBytes(a))
+	}
+
+	utils.CloseFile(targetFile)
 	utils.CloseFile(fileA)
 	utils.CloseFile(fileB)
 	e.Remove([]string{pathA, pathB})
-
-	fmt.Println("res", utils.BytesToInt16(utils.Read(mergePath)))
-
-	return mergePath
 }
 
 func (e External) calcMaxBuf(read int64, fileSize int64, maxMemoryUse int64) (maxBuf int64) {

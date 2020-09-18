@@ -1,9 +1,7 @@
 package utils
 
 import (
-	"fmt"
 	"io"
-	"log"
 	"math"
 	"math/rand"
 	"os"
@@ -47,6 +45,10 @@ func Write(f *os.File, buf []byte) {
 	_, e := f.Write(buf)
 
 	handleError(e)
+}
+
+func Copy(dst *os.File, source *os.File, maxBuf int64) {
+	limitCopy(dst, source, FileStat(source).Size(), maxBuf)
 }
 
 func Delete(path string) {
@@ -119,7 +121,6 @@ func SplitFile(path string, pathA, pathB string, maxBuf int64) {
 	fileB := CreateFile(pathB)
 	defer CloseFile(fileB)
 	sourceSize := FileStat(source).Size()
-	fmt.Println(sourceSize)
 
 	aSize := sourceSize / 2
 
@@ -168,7 +169,7 @@ func CreateFile(path string) *os.File {
 }
 
 func OpenFile(path string) *os.File {
-	f, err := os.Open(path)
+	f, err := os.OpenFile(path, os.O_RDWR, 0660)
 	handleError(err)
 	return f
 }
@@ -192,14 +193,11 @@ func FileStat(f *os.File) os.FileInfo {
 
 func CloseFile(f *os.File) {
 	err := f.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
+	handleError(err)
 }
 
 func handleError(err error) {
 	if err != nil {
 		panic(err)
-		//log.Fatal(fName, ":", err)
 	}
 }
