@@ -47,10 +47,6 @@ func Write(f *os.File, buf []byte) {
 	handleError(e)
 }
 
-func Copy(dst *os.File, source *os.File, maxBuf int64) {
-	limitCopy(dst, source, FileStat(source).Size(), maxBuf)
-}
-
 func Delete(path string) {
 	err := os.Remove(path)
 	handleError(err)

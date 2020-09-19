@@ -115,10 +115,10 @@ func (e External) mergeFiles(pathA, pathB, targetPath string) {
 
 			} else {
 				utils.Write(targetFile, utils.Int16ToBytes(b))
-				readB += 2
+				readB += int16Size
 				if readB == sizeB {
 					utils.Write(targetFile, utils.Int16ToBytes(a))
-					readA += 2
+					readA += int16Size
 					break
 				}
 				_, b = utils.ReadAndParse(fileB, int64(int16Size))
