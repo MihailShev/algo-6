@@ -191,6 +191,11 @@ func FileStat(f *os.File) os.FileInfo {
 	return s
 }
 
+func Seek(f *os.File, offset int64) {
+	_, err := f.Seek(offset, 0)
+	handleError(err)
+}
+
 func CloseFile(f *os.File) {
 	err := f.Close()
 	handleError(err)

@@ -3,7 +3,7 @@ package sorting
 type MergeSort struct {
 }
 
-func (m MergeSort) Sort(arr []int) []int {
+func (m MergeSort) Sort(arr []int16) []int16 {
 	size := len(arr)
 
 	if size <= 1 {
@@ -18,7 +18,7 @@ func (m MergeSort) Sort(arr []int) []int {
 	leftIndex := 0
 	rightIndex := leftSize
 
-	tmp := make([]int, 0, size)
+	tmp := make([]int16, 0, size)
 
 	for leftIndex < leftSize && rightIndex < size {
 		if arr[leftIndex] < arr[rightIndex] {

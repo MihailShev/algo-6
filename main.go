@@ -4,6 +4,7 @@ import (
 	"algo-6/sorting"
 	"algo-6/utils"
 	"fmt"
+	"math"
 	"math/rand"
 	"time"
 )
@@ -11,21 +12,21 @@ import (
 var testArr = []int{7, 0, 6, 1, 3, 2, 8, 5, 4, 9}
 
 func main() {
-	utils.GenerateFile("test", 200_000, 1, 10000)
-	t := utils.BytesToInt16(utils.Read("test"))
-	fmt.Println("test", utils.BytesToInt16(utils.Read("test")))
+	utils.GenerateFile("test", 1_000_000, 1, math.MaxInt16)
+	//t := utils.BytesToInt16(utils.Read("test"))
+	//fmt.Println("test before sorting", utils.BytesToInt16(utils.Read("test")))
 
-	x := make([]int, 0)
-
-	for _, v := range t {
-		x = append(x, int(v))
-	}
-
-	fmt.Println(sorting.MergeSort{}.Sort(x))
-	s := time.Now()
-	sorting.External{}.Sort("test", 1024)
-	fmt.Println("test", utils.BytesToInt16(utils.Read("test")))
-	fmt.Println("execution time", time.Since(s))
+	//fmt.Println(sorting.MergeSort{}.Sort(x))
+	//fmt.Println("quick sort", sorting.MergeSort{}.Sort(t))
+	start := time.Now()
+	//sorting.External{MaxMemoryUse: 4096, InternalSort: sorting.Shell{
+	//	StepType: sorting.SedgewickSteps,
+	//}}.Sort("test")
+	sorting.External{MaxMemoryUse: 4096, InternalSort: sorting.Quick{}}.Sort("test")
+	//sorting.Shell{StepType: sorting.SedgewickSteps}.Sort(t)
+	stop := time.Since(start)
+	//fmt.Println("test after sorting", utils.BytesToInt16(utils.Read("test")))
+	fmt.Println("execution time", stop)
 	//utils.SplitFile("test", "1", "2", 10)
 	//fmt.Println(utils.BytesToInt16(utils.Read("2")))
 
