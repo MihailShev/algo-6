@@ -31,7 +31,6 @@ func (e External) Sort(path string) {
 	if e.InternalSort == nil {
 		e.sort(path)
 	} else {
-		fmt.Println("start with external sort")
 		e.sortWithInternal(path)
 	}
 }

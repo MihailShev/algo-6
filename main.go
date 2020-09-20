@@ -5,51 +5,94 @@ import (
 	"algo-6/utils"
 	"fmt"
 	"math"
-	"math/rand"
 	"time"
 )
 
-var test = []int16{58, 20, 5, 49, 82, 59, 81, 63, 63, 20}
+const tmpPath = "tmp/test"
 
 func main() {
-	fmt.Println(math.MaxInt32)
-	utils.GenerateFile("test", 1000_000, 1, math.MaxInt8)
+	src1e6 := "tmp/1e6"
+	src1e7 := "tmp/1e7"
+	src1e8 := "tmp/1e8"
+	src1e9 := "tmp/1e9"
 
-	//t := utils.BytesToInt16(utils.Read("test"))
-	//start := time.Now()
-	//sorting.Radix{}.Sort(t)
-	//stop := time.Since(start)
+	fmt.Println("Start generating files")
+	utils.GenerateFile(src1e6, 1_000_000, 1, math.MaxInt16)
+	fmt.Println("1e6")
+	utils.GenerateFile(src1e7, 10_000_000, 1, math.MaxInt16)
+	fmt.Println("1e7")
+	utils.GenerateFile(src1e8, 100_000_000, 1, math.MaxInt16)
+	fmt.Println("1e8")
+	utils.GenerateFile(src1e9, 1000_000_000, 1, math.MaxInt16)
+	fmt.Println("1e9")
 
-	//fmt.Println("test before sorting", utils.BytesToInt16(utils.Read("test")))
+	ext1e6 := "tmp/external_1e6-test"
+	extWithInternal1e6 := "tmp/ext_1e6-with-internal-sort-test"
+	extWithInternal1e7 := "tmp/ext_1e7-with-internal-sort-test"
+	extWithInternal1e8 := "tmp/ext_1e8-with-internal-sort-test"
 
-	//fmt.Println(sorting.MergeSort{}.Sort(x))
-	//fmt.Println("quick sort", sorting.MergeSort{}.Sort(t))
+	fmt.Println("copying...")
+
+	utils.Copy(ext1e6, src1e6)
+	utils.Copy(extWithInternal1e6, src1e6)
+	utils.Copy(extWithInternal1e7, src1e7)
+	utils.Copy(extWithInternal1e8, src1e8)
+	fmt.Println("Finished")
+
+	//fmt.Printf("\n\n*** Test external sort 1e6 ***\n\n")
+	//test(func() {Л
+	//	sorting.External{}.Sort(ext1e6)
+	//})
+
+	fmt.Printf("*** Test external sort with internal sort 1e6 ***\n\n")
+	test(func() {
+		sorting.External{MaxMemoryUse: 4096, InternalSort: sorting.Shell{
+			StepType: sorting.SedgewickSteps,
+		}}.Sort(extWithInternal1e6)
+	})
+
+	fmt.Printf("*** Test external sort with internal sort 1e7 ***\n\n")
+	test(func() {
+		sorting.External{MaxMemoryUse: 4096, InternalSort: sorting.Shell{
+			StepType: sorting.SedgewickSteps,
+		}}.Sort(extWithInternal1e7)
+	})
+
+	//fmt.Printf("*** Test external sort with internal sort 1e8 ***\n\n")
+	//test(func() {
+	//	sorting.External{MaxMemoryUse: 4096, InternalSort: sorting.Shell{
+	//		StepType: sorting.SedgewickSteps,
+	//	}}.Sort(extWithInternal1e8)
+	//})
+
+	fmt.Printf("*** Test radix sort 1e6 ***\n\n")
+	num := utils.ReadPathAndParse(src1e6)
+	test(func() {
+		sorting.Radix{}.Sort(num)
+	})
+
+	fmt.Printf("*** Test radix sort 1e7 ***\n\n")
+	num = utils.ReadPathAndParse(src1e7)
+	test(func() {
+		sorting.Radix{}.Sort(num)
+	})
+
+	fmt.Printf("*** Test radix sort 1e8 ***\n\n")
+	num = utils.ReadPathAndParse(src1e8)
+	test(func() {
+		sorting.Radix{}.Sort(num)
+	})
+
+	fmt.Printf("*** Test radix sort 1e9 ***\n\n")
+	num = utils.ReadPathAndParse(src1e9)
+	test(func() {
+		sorting.Radix{}.Sort(num)
+	})
+}
+
+func test(run func()) {
 	start := time.Now()
-	//sorting.External{MaxMemoryUse: 4096, InternalSort: sorting.Shell{
-	//	StepType: sorting.SedgewickSteps,
-	//}}.Sort("test")
-	sorting.External{MaxMemoryUse: 4096, InternalSort: sorting.Quick{}}.Sort("test")
-	//sorting.Shell{StepType: sorting.SedgewickSteps}.Sort(t)
+	run()
 	stop := time.Since(start)
-	//fmt.Println("test after sorting", utils.BytesToInt16(utils.Read("test")))
-	//x := utils.BytesToInt16(utils.Read("test"))
-	//fmt.Println(len(x))
-	fmt.Println("execution time", stop)
-	//utils.SplitFile("test", "1", "2", 10)
-	//fmt.Println(utils.BytesToInt16(utils.Read("2")))
-
-	//sorting.MergeSort{}.Sort(testArr)
-	//fmt.Println(testArr)
-}
-
-func randomString(l int) []int {
-	bytes := make([]int, l)
-	for i := 0; i < l; i++ {
-		bytes[i] = randInt(65, 90)
-	}
-	return bytes
-}
-
-func randInt(min int, max int) int {
-	return min + rand.Intn(max-min)
+	fmt.Printf("Execution time: %s\n\n", stop)
 }

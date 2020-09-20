@@ -67,6 +67,14 @@ func Read(path string) []byte {
 	return buf
 }
 
+func ReadPathAndParse(path string) []int16 {
+	f := OpenFile(path)
+	defer CloseFile(f)
+	size := FileStat(f).Size()
+	_, res := ReadAndParse(f, size)
+	return res
+}
+
 func ReadBuf(f *os.File, maxBuf int64) (int64, []byte) {
 	buf := make([]byte, maxBuf)
 
@@ -128,6 +136,15 @@ func SplitFile(path string, pathA, pathB string, maxBuf int64) {
 
 	limitCopy(fileA, source, aSize, maxBuf)
 	limitCopy(fileB, source, bSize, maxBuf)
+}
+
+func Copy(dst, source string) {
+	dstFile := CreateFile(dst)
+	sourceFile := OpenFile(source)
+	_, err := io.Copy(dstFile, sourceFile)
+	handleError(err)
+	CloseFile(dstFile)
+	CloseFile(sourceFile)
 }
 
 func limitCopy(dst *os.File, source *os.File, size int64, maxBuf int64) {
