@@ -8,8 +8,6 @@ import (
 	"time"
 )
 
-const tmpPath = "tmp/test"
-
 func main() {
 	src1e6 := "tmp/1e6"
 	src1e7 := "tmp/1e7"
@@ -39,10 +37,10 @@ func main() {
 	utils.Copy(extWithInternal1e8, src1e8)
 	fmt.Println("Finished")
 
-	//fmt.Printf("\n\n*** Test external sort 1e6 ***\n\n")
-	//test(func() {Л
-	//	sorting.External{}.Sort(ext1e6)
-	//})
+	fmt.Printf("\n\n*** Test external sort 1e6 ***\n\n")
+	test(func() {
+		sorting.External{}.Sort(ext1e6)
+	})
 
 	fmt.Printf("*** Test external sort with internal sort 1e6 ***\n\n")
 	test(func() {
@@ -58,12 +56,12 @@ func main() {
 		}}.Sort(extWithInternal1e7)
 	})
 
-	//fmt.Printf("*** Test external sort with internal sort 1e8 ***\n\n")
-	//test(func() {
-	//	sorting.External{MaxMemoryUse: 4096, InternalSort: sorting.Shell{
-	//		StepType: sorting.SedgewickSteps,
-	//	}}.Sort(extWithInternal1e8)
-	//})
+	fmt.Printf("*** Test external sort with internal sort 1e8 ***\n\n")
+	test(func() {
+		sorting.External{MaxMemoryUse: 4096, InternalSort: sorting.Shell{
+			StepType: sorting.SedgewickSteps,
+		}}.Sort(extWithInternal1e8)
+	})
 
 	fmt.Printf("*** Test radix sort 1e6 ***\n\n")
 	num := utils.ReadPathAndParse(src1e6)
