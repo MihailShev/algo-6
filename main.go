@@ -4,11 +4,20 @@ import (
 	"algo-6/sorting"
 	"algo-6/utils"
 	"fmt"
+	"log"
 	"math"
+	"os"
 	"time"
 )
 
 func main() {
+
+	err := os.Mkdir("tmp", 0777)
+
+	if err != nil && !os.IsExist(err) {
+		log.Fatal(err)
+	}
+
 	src1e6 := "tmp/1e6"
 	src1e7 := "tmp/1e7"
 	src1e8 := "tmp/1e8"
@@ -39,28 +48,28 @@ func main() {
 
 	fmt.Printf("\n\n*** Test external sort 1e6 ***\n\n")
 	test(func() {
-		sorting.External{}.Sort(ext1e6)
+		sorting.External{}.SortFile(ext1e6)
 	})
 
 	fmt.Printf("*** Test external sort with internal sort 1e6 ***\n\n")
 	test(func() {
 		sorting.External{MaxMemoryUse: 4096, InternalSort: sorting.Shell{
 			StepType: sorting.SedgewickSteps,
-		}}.Sort(extWithInternal1e6)
+		}}.SortFile(extWithInternal1e6)
 	})
 
 	fmt.Printf("*** Test external sort with internal sort 1e7 ***\n\n")
 	test(func() {
 		sorting.External{MaxMemoryUse: 4096, InternalSort: sorting.Shell{
 			StepType: sorting.SedgewickSteps,
-		}}.Sort(extWithInternal1e7)
+		}}.SortFile(extWithInternal1e7)
 	})
 
 	fmt.Printf("*** Test external sort with internal sort 1e8 ***\n\n")
 	test(func() {
 		sorting.External{MaxMemoryUse: 4096, InternalSort: sorting.Shell{
 			StepType: sorting.SedgewickSteps,
-		}}.Sort(extWithInternal1e8)
+		}}.SortFile(extWithInternal1e8)
 	})
 
 	fmt.Printf("*** Test radix sort 1e6 ***\n\n")

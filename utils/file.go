@@ -2,15 +2,11 @@ package utils
 
 import (
 	"io"
-	"math"
 	"math/rand"
 	"os"
 	"time"
 	"unsafe"
 )
-
-const min = 0
-const max = math.MaxUint16
 
 func GenerateFile(path string, amount int, min int, max int) {
 	f, err := os.Create(path)
@@ -26,8 +22,6 @@ func GenerateFile(path string, amount int, min int, max int) {
 
 		num := min + rand.Intn(max-min)
 
-		//fmt.Println(num)
-
 		b := *(*byte)(unsafe.Pointer(&num))
 		arr = append(arr, b)
 		b = *(*byte)(unsafe.Pointer(uintptr(unsafe.Pointer(&num)) + uintptr(1)))
@@ -36,9 +30,6 @@ func GenerateFile(path string, amount int, min int, max int) {
 
 	_, err = f.Write(arr)
 	handleError(err)
-	//buf := Read(path)
-
-	//fmt.Println(BytesToInt16(buf))
 }
 
 func Write(f *os.File, buf []byte) {
@@ -50,21 +41,6 @@ func Write(f *os.File, buf []byte) {
 func Delete(path string) {
 	err := os.Remove(path)
 	handleError(err)
-}
-
-func Read(path string) []byte {
-	f := OpenFile(path)
-	defer CloseFile(f)
-
-	buf := make([]byte, 0)
-
-	s := FileStat(f)
-
-	buf = make([]byte, s.Size())
-
-	_, err := f.Read(buf)
-	handleError(err)
-	return buf
 }
 
 func ReadPathAndParse(path string) []int16 {

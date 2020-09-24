@@ -16,7 +16,7 @@ type External struct {
 	InternalSort ISort
 }
 
-func (e External) Sort(path string) {
+func (e External) SortFile(path string) {
 	counter := 0
 	e.nameCounter = &counter
 
